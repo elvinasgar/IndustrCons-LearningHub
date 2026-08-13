@@ -17,8 +17,10 @@
     <h1 id="p-title"></h1>
     <p class="tagline" id="p-desc"></p>
     <div class="meta-row" id="p-meta"></div>
+    <div id="diploma-cta" style="margin-top:26px;"></div>
   </div>
 </div>
+<div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
 
 <section>
   <div class="wrap">
@@ -84,6 +86,15 @@
     span.textContent = r;
     roles.appendChild(span);
   });
+
+  const comp = programCompletion(prog);
+  document.getElementById('prog-fill').style.width = comp.percent + '%';
+  const cta = document.getElementById('diploma-cta');
+  if (comp.complete) {
+    cta.innerHTML = `<a class="btn btn-primary" href="certificate.html?program=${prog.id}">${t('get_diploma')}</a>`;
+  } else if (comp.total > 0) {
+    cta.innerHTML = `<span class="pill">${comp.done}/${comp.total} ${t('subjects_done_count')}</span>`;
+  }
 </script>
 </body>
 </html>
