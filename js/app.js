@@ -37,7 +37,8 @@ function renderHeader(active) {
       <nav class="main-nav">
         <a href="index.html" data-i18n="nav_home" ${active==='home'?'style="color:var(--cyan)"':''}></a>
         <a href="programs.html" data-i18n="nav_programs" ${active==='programs'?'style="color:var(--cyan)"':''}></a>
-        <a href="#" data-i18n="nav_internship"></a>
+        <a href="about.html" data-i18n="nav_about" ${active==='about'?'style="color:var(--cyan)"':''}></a>
+        <a href="faq.html" data-i18n="nav_faq" ${active==='faq'?'style="color:var(--cyan)"':''}></a>
         <div class="lang-toggle">
           <button data-lang="az" class="${lang==='az'?'active':''}">AZ</button>
           <button data-lang="en" class="${lang==='en'?'active':''}">EN</button>
@@ -64,6 +65,59 @@ function applyI18n() {
 }
 
 function difficultyLabel(d) { return t("difficulty_" + d); }
+
+/* ---------- Program completion & diploma ---------- */
+
+function isSubjectComplete(subjectId) {
+  const s = DB.subjects[subjectId];
+  if (!s || s.stub || !s.tasks || !s.tasks.length) return false;
+  const p = getProgress();
+  const done = p[subjectId] ? Object.keys(p[subjectId]).length : 0;
+  return done >= s.tasks.length;
+}
+
+function programCompletion(program) {
+  const gradable = program.subjects.filter(sid => DB.subjects[sid] && !DB.subjects[sid].stub);
+  const done = gradable.filter(isSubjectComplete);
+  return {
+    total: gradable.length,
+    done: done.length,
+    percent: gradable.length ? Math.round((done.length / gradable.length) * 100) : 0,
+    complete: gradable.length > 0 && done.length === gradable.length
+  };
+}
+
+const DIPLOMA_KEY = "ic_lh_diplomas"; // { programId: { credId, date, name } }
+
+function getDiplomaRecord(programId) {
+  let all = {};
+  try { all = JSON.parse(localStorage.getItem(DIPLOMA_KEY)) || {}; } catch (e) {}
+  if (!all[programId]) {
+    const year = new Date().getFullYear();
+    const rand = Math.floor(100000 + Math.random() * 900000);
+    all[programId] = {
+      credId: `IC-LH-${programId.toUpperCase()}-${year}-${rand}`,
+      date: new Date().toISOString(),
+      name: ""
+    };
+    localStorage.setItem(DIPLOMA_KEY, JSON.stringify(all));
+  }
+  return all[programId];
+}
+
+function saveDiplomaName(programId, name) {
+  let all = {};
+  try { all = JSON.parse(localStorage.getItem(DIPLOMA_KEY)) || {}; } catch (e) {}
+  if (all[programId]) { all[programId].name = name; localStorage.setItem(DIPLOMA_KEY, JSON.stringify(all)); }
+}
+
+function formatMonthYear(isoDate, lang) {
+  const d = new Date(isoDate);
+  const monthsAz = ["Yanvar","Fevral","Mart","Aprel","May","İyun","İyul","Avqust","Sentyabr","Oktyabr","Noyabr","Dekabr"];
+  const monthsEn = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+  const months = lang === "en" ? monthsEn : monthsAz;
+  return `${months[d.getMonth()]} ${d.getFullYear()}`;
+}
 
 function initShell(active) {
   renderHeader(active);
