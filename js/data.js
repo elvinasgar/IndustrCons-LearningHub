@@ -146,6 +146,15 @@ const DB = {
           criteria: {
             az: ["Bütün 15 fəaliyyət daxil edilib", "Hierarxiya məntiqi düzgündür", "Adlandırma tutarlıdır"],
             en: ["All 15 activities included", "Hierarchy logic is correct", "Naming is consistent"]
+          },
+          check: {
+            type: "mc",
+            question: { az: "Düzgün qurulmuş WBS-də ən yuxarı (1-ci) səviyyə nəyi göstərir?", en: "In a correctly built WBS, what does the top (level 1) level represent?" },
+            options: {
+              az: ["Ayrı-ayrı fəaliyyətlər (məs. beton tökmə)", "Bütün layihə (məs. bina)", "Materialların siyahısı"],
+              en: ["Individual activities (e.g. concrete pour)", "The whole project (e.g. the building)", "A list of materials"]
+            },
+            correct: 1
           }
         },
         {
@@ -153,8 +162,8 @@ const DB = {
           title: { az: "Tapşırıq 2 — Kritik Yolun Hesablanması", en: "Task 2 — Calculate the Critical Path" },
           role: { az: "Siz Planning Engineer rolundasınız.", en: "You are acting as a Planning Engineer." },
           scenario: {
-            az: "10 fəaliyyətdən ibarət şəbəkə diaqramı və hər fəaliyyətin müddəti verilib.",
-            en: "A 10-activity network diagram with durations for each activity is provided."
+            az: "Aşağıdakı 5 fəaliyyətdən ibarət kiçik şəbəkə verilib: A (3 gün, asılılıq yoxdur) → B (5 gün, A-dan sonra) → D (6 gün, B-dən sonra) → E (2 gün, D-dən sonra); paralel olaraq A (3 gün) → C (4 gün, A-dan sonra) → E (2 gün, C-dən sonra). E hər iki yoldan (B-D və C) asılıdır və yalnız hər ikisi bitdikdən sonra başlaya bilər.",
+            en: "A small 5-activity network is given: A (3 days, no dependency) → B (5 days, after A) → D (6 days, after B) → E (2 days, after D); in parallel, A (3 days) → C (4 days, after A) → E (2 days, after C). E depends on both paths (B-D and C) and can only start once both are finished."
           },
           mentor: {
             az: "Kritik yol — layihənin ən uzun (buferi olmayan) ardıcıllığıdır. Onu gecikdirmək bütün layihəni gecikdirir. Ümumi səhv: ən çox fəaliyyəti olan yolu kritik hesab etmək — düzgün ölçü müddətdir, say deyil.",
@@ -169,6 +178,11 @@ const DB = {
           criteria: {
             az: ["Hesablamalar düzgündür", "Kritik yol düzgün müəyyən edilib", "Float dəyərləri göstərilib"],
             en: ["Calculations are correct", "Critical path correctly identified", "Float values shown"]
+          },
+          check: {
+            type: "text",
+            question: { az: "Yuxarıdakı şəbəkəyə görə layihənin ümumi müddəti (kritik yol) neçə gündür?", en: "Based on the network above, what is the project's total duration (critical path), in days?" },
+            answers: ["16", "16 gün", "16 gun", "16 days"]
           }
         },
         {
@@ -192,6 +206,15 @@ const DB = {
           criteria: {
             az: ["Səbəb-nəticə düzgün əlaqələndirilib", "Təsnifat məntiqlidir", "Bərpa planı realistdir"],
             en: ["Cause-effect correctly linked", "Classification is logical", "Recovery plan is realistic"]
+          },
+          check: {
+            type: "mc",
+            question: { az: "Layihə hava şəraiti (fors-major) səbəbindən gecikibsə, bu adətən hansı kateqoriyaya aid edilir?", en: "If a project is delayed due to weather (a force-majeure event), which category does this usually fall under?" },
+            options: {
+              az: ["İcraçının günahı (Contractor)", "Sifarişçinin günahı (Employer)", "Neytral / bağışlanan (Neutral / Excusable)"],
+              en: ["Contractor's fault", "Employer's fault", "Neutral / Excusable"]
+            },
+            correct: 2
           }
         }
       ],
