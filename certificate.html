@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diploma — IndustrCons Learning Hub</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .cert-page { padding: 48px 0 80px; }
+  .cert-poster {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    position: relative;
+    padding: 56px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .cert-poster::before {
+    content: ""; position: absolute; inset: 12px;
+    border: 1px solid var(--cyan);
+    pointer-events: none;
+  }
+  .cert-inner { position: relative; text-align: center; }
+  .cert-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 28px; }
+  .cert-brand .mark { width: 26px; height: 26px; border: 2px solid var(--amber); position: relative; }
+  .cert-brand .mark::before, .cert-brand .mark::after { content: ""; position: absolute; background: var(--amber); }
+  .cert-brand .mark::before { top: 50%; left: 3px; right: 3px; height: 2px; transform: translateY(-50%); }
+  .cert-brand .mark::after { left: 50%; top: 3px; bottom: 3px; width: 2px; transform: translateX(-50%); }
+  .cert-brand span { font-family: var(--serif); font-weight: 600; font-size: 1.1rem; letter-spacing: 0.02em; }
+  .cert-kicker { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cyan); margin-bottom: 10px; }
+  .cert-title { font-family: var(--serif); font-weight: 600; font-size: 2rem; margin: 0 0 30px; }
+  .cert-name-input {
+    font-family: var(--serif); font-size: 1.7rem; text-align: center; border: none; border-bottom: 2px solid var(--ink);
+    background: transparent; padding: 6px 10px 10px; width: 80%; max-width: 460px; color: var(--ink);
+  }
+  .cert-name-input:focus { outline: none; border-color: var(--amber); }
+  .cert-awarded { color: var(--steel); font-size: 0.95rem; margin: 18px 0 6px; }
+  .cert-program { font-family: var(--serif); font-size: 1.5rem; font-weight: 600; margin: 0 0 34px; color: var(--steel); }
+  .cert-meta {
+    display: flex; justify-content: center; gap: 40px; flex-wrap: wrap;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: 20px 0; margin-bottom: 26px;
+  }
+  .cert-meta div { text-align: center; }
+  .cert-meta .k { font-family: var(--mono); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--steel); display: block; margin-bottom: 4px; }
+  .cert-meta .v { font-family: var(--mono); font-size: 0.95rem; color: var(--ink); }
+  .cert-linkedin { font-family: var(--mono); font-size: 0.82rem; color: var(--cyan); margin-bottom: 8px; }
+  .cert-verify { font-size: 0.78rem; color: var(--steel); max-width: 50ch; margin: 0 auto 4px; }
+  .cert-disclaimer { font-size: 0.72rem; color: var(--steel); max-width: 56ch; margin: 18px auto 0; opacity: 0.8; }
+  .cert-actions { text-align: center; margin-top: 28px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  @media print {
+    .site-header, .site-footer, .cert-actions, .breadcrumb-row { display: none !important; }
+    body { background: white; }
+    section.cert-page { padding: 0; }
+    .cert-poster { border-width: 2px; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<header id="site-header" class="site-header"></header>
+
+<section class="cert-page">
+  <div class="wrap">
+    <div class="breadcrumb breadcrumb-row"><a href="#" id="back-link" data-i18n="dip_back_to_program"></a></div>
+
+    <div id="locked-view" style="display:none;text-align:center;padding:60px 20px;">
+      <h1 style="font-family:var(--serif);font-size:1.6rem;margin-bottom:12px;" data-i18n="dip_locked_title"></h1>
+      <p class="muted" data-i18n="dip_locked_body"></p>
+    </div>
+
+    <div id="cert-view" style="display:none;">
+      <div class="cert-poster">
+        <div class="cert-inner">
+          <div class="cert-brand"><span class="mark"></span><span>IndustrCons Learning Hub</span></div>
+          <div class="cert-kicker" data-i18n="dip_kicker"></div>
+          <h1 class="cert-title" id="cert-title"></h1>
+
+          <input type="text" id="cert-name" class="cert-name-input" data-i18n-placeholder="dip_name_placeholder">
+
+          <p class="cert-awarded" data-i18n="dip_awarded"></p>
+          <p class="cert-program" id="cert-program"></p>
+
+          <div class="cert-meta">
+            <div><span class="k" data-i18n="dip_date_label"></span><span class="v" id="cert-date"></span></div>
+            <div><span class="k" data-i18n="dip_hours_label"></span><span class="v" id="cert-hours"></span></div>
+            <div><span class="k" data-i18n="dip_cred_label"></span><span class="v" id="cert-id"></span></div>
+          </div>
+
+          <div class="cert-linkedin" id="cert-linkedin"></div>
+          <p class="cert-verify" data-i18n="dip_verify_note"></p>
+          <p class="cert-disclaimer" data-i18n="dip_disclaimer"></p>
+        </div>
+      </div>
+
+      <div class="cert-actions">
+        <button class="btn btn-primary" id="print-btn" data-i18n="dip_print"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="site-footer" class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+<script>
+  document.documentElement.lang = getLang();
+  initShell('programs');
+
+  const params = new URLSearchParams(location.search);
+  const prog = DB.programs.find(p => p.id === params.get('program'));
+  const lang = getLang();
+  document.getElementById('back-link').href = prog ? `program.html?id=${prog.id}` : 'programs.html';
+
+  if (!prog) { document.getElementById('locked-view').style.display = 'block'; }
+  else {
+    const comp = programCompletion(prog);
+    if (!comp.complete) {
+      document.getElementById('locked-view').style.display = 'block';
+    } else {
+      document.getElementById('cert-view').style.display = 'block';
+      const rec = getDiplomaRecord(prog.id);
+
+      document.getElementById('cert-title').textContent = t('dip_title_prefix');
+      document.getElementById('cert-program').textContent = prog.title[lang];
+      document.getElementById('cert-date').textContent = formatMonthYear(rec.date, lang);
+      document.getElementById('cert-hours').textContent = prog.hours;
+      document.getElementById('cert-id').textContent = rec.credId;
+      document.getElementById('cert-linkedin').textContent = t('dip_linkedin') + ': linkedin.com/company/industrcons';
+
+      const nameInput = document.getElementById('cert-name');
+      nameInput.value = rec.name || '';
+      nameInput.placeholder = t('dip_name_placeholder');
+      nameInput.addEventListener('blur', () => saveDiplomaName(prog.id, nameInput.value.trim()));
+
+      document.getElementById('print-btn').addEventListener('click', () => window.print());
+    }
+  }
+</script>
+</body>
+</html>
