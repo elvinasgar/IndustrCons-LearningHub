@@ -116,6 +116,19 @@
     s.tasks.forEach(task => {
       const card = document.createElement('div');
       card.className = 'task-card';
+      const done = isTaskDone(sid, task.id);
+
+      let checkHtml = '';
+      if (task.check.type === 'mc') {
+        checkHtml = task.check.options[lang].map((opt, i) => `
+          <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;font-size:0.92rem;cursor:pointer;">
+            <input type="radio" name="check-${task.id}" value="${i}" ${done ? 'disabled' : ''}>
+            <span>${opt}</span>
+          </label>`).join('');
+      } else {
+        checkHtml = `<input type="text" class="check-text-input" placeholder="${t('check_placeholder')}" ${done ? 'disabled' : ''} style="width:100%;padding:10px 12px;border:1px solid var(--line);font-family:var(--sans);font-size:0.92rem;">`;
+      }
+
       card.innerHTML = `
         <div class="task-head">
           <h3>${task.title[lang]}</h3>
@@ -126,10 +139,17 @@
           <div class="task-field"><span class="lbl">${t('mentor_label')}</span><div class="mentor-box">${task.mentor[lang]}</div></div>
           <div class="task-field"><span class="lbl">${t('instructions_label')}</span><p>${task.instructions[lang]}</p></div>
           <div class="task-field"><span class="lbl">${t('criteria_label')}</span><ul class="crit-list">${task.criteria[lang].map(c=>`<li>${c}</li>`).join('')}</ul></div>
+          <div class="task-field" style="border-top:1px dashed var(--line);padding-top:14px;">
+            <span class="lbl">${t('check_label')}</span>
+            <p style="font-weight:600;margin-bottom:10px;">${task.check.question[lang]}</p>
+            <div class="check-widget" data-task="${task.id}">${checkHtml}</div>
+            ${!done ? `<button class="mark-btn check-submit-btn" data-task="${task.id}" style="margin-top:8px;">${t('check_submit')}</button>` : ''}
+            <div class="check-feedback" data-task="${task.id}" style="margin-top:8px;font-size:0.88rem;${done ? 'color:var(--cyan);font-weight:600;' : ''}">${done ? t('check_correct') : ''}</div>
+          </div>
         </div>
         <div class="task-foot">
           <span>${t('format_label')}: ${task.format[lang]} · ${t('time_label')}: ${task.time[lang]}</span>
-          <button class="mark-btn" data-task="${task.id}">${t('mark_done')}</button>
+          <span class="task-diff" style="color:${done ? 'var(--cyan)' : 'var(--steel)'};">${done ? t('marked_done') : t('task_locked_note')}</span>
         </div>`;
       tasksEl.appendChild(card);
     });
@@ -140,19 +160,42 @@
     function refreshProgress() {
       const pct = subjectCompletion(sid, s.tasks.length);
       document.getElementById('progress-fill').style.width = pct + '%';
-      document.querySelectorAll('.mark-btn').forEach(btn => {
-        const done = isTaskDone(sid, btn.dataset.task);
-        btn.textContent = done ? t('marked_done') : t('mark_done');
-        btn.classList.toggle('done', done);
-      });
     }
-    document.querySelectorAll('.mark-btn').forEach(btn => {
+
+    document.querySelectorAll('.check-submit-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const done = isTaskDone(sid, btn.dataset.task);
-        setTaskDone(sid, btn.dataset.task, !done);
-        refreshProgress();
+        const taskId = btn.dataset.task;
+        const task = s.tasks.find(x => x.id === taskId);
+        const feedback = document.querySelector(`.check-feedback[data-task="${taskId}"]`);
+        let correct = false;
+
+        if (task.check.type === 'mc') {
+          const picked = document.querySelector(`input[name="check-${taskId}"]:checked`);
+          if (!picked) { feedback.style.color = 'var(--amber)'; feedback.textContent = t('check_pick'); return; }
+          correct = parseInt(picked.value, 10) === task.check.correct;
+        } else {
+          const input = document.querySelector(`.check-widget[data-task="${taskId}"] .check-text-input`);
+          const val = (input.value || '').trim().toLowerCase();
+          correct = task.check.answers.some(a => a.toLowerCase() === val);
+        }
+
+        if (correct) {
+          setTaskDone(sid, taskId, true);
+          feedback.style.color = 'var(--cyan)'; feedback.style.fontWeight = '600';
+          feedback.textContent = t('check_correct');
+          document.querySelectorAll(`.check-widget[data-task="${taskId}"] input`).forEach(el => el.disabled = true);
+          btn.remove();
+          const footStatus = btn.closest('.task-card').querySelector('.task-foot span:last-child');
+          footStatus.style.color = 'var(--cyan)';
+          footStatus.textContent = t('marked_done');
+          refreshProgress();
+        } else {
+          feedback.style.color = 'var(--amber)'; feedback.style.fontWeight = '600';
+          feedback.textContent = t('check_wrong');
+        }
       });
     });
+
     refreshProgress();
   }
 </script>
