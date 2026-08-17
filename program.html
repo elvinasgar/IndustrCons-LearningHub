@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Program — IndustrCons Learning Hub</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header id="site-header" class="site-header"></header>
+
+<div class="detail-hero">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="programs.html" data-i18n="back"></a></div>
+    <span class="pill" id="p-code"></span>
+    <h1 id="p-title"></h1>
+    <p class="tagline" id="p-desc"></p>
+    <div class="meta-row" id="p-meta"></div>
+    <div id="diploma-cta" style="margin-top:26px;"></div>
+  </div>
+</div>
+<div class="progress-track"><div class="progress-fill" id="prog-fill"></div></div>
+
+<section>
+  <div class="wrap">
+    <div class="section-head">
+      <h2 data-i18n="subjects_title"></h2>
+    </div>
+    <div class="subject-grid" id="subject-cards"></div>
+  </div>
+</section>
+
+<section style="padding-top:0;">
+  <div class="wrap">
+    <div class="section-head">
+      <h2 data-i18n="roles_title"></h2>
+    </div>
+    <div class="role-list" id="role-list"></div>
+  </div>
+</section>
+
+<footer id="site-footer" class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+<script>
+  document.documentElement.lang = getLang();
+  initShell('programs');
+
+  const params = new URLSearchParams(location.search);
+  const prog = DB.programs.find(p => p.id === params.get('id')) || DB.programs[0];
+  const lang = getLang();
+
+  document.getElementById('p-code').textContent = prog.code;
+  document.getElementById('p-title').textContent = prog.title[lang];
+  document.getElementById('p-desc').textContent = prog.description[lang];
+  document.getElementById('p-meta').innerHTML = `
+    <span><b>${prog.hours}</b>${t('program_hours')}</span>
+    <span><b>${prog.subjects.length}</b>${t('program_subjects')}</span>
+    <span><b>${prog.level}</b>Level</span>`;
+
+  const sgrid = document.getElementById('subject-cards');
+  prog.subjects.forEach(sid => {
+    const s = DB.subjects[sid];
+    if (!s) return;
+    const a = document.createElement('a');
+    a.className = 'tb-card';
+    a.href = `subject.html?id=${sid}`;
+    a.innerHTML = `
+      <div class="tb-corner tl"></div><div class="tb-corner br"></div>
+      <div class="tb-code">${s.code}</div>
+      <h3>${s.title[lang]}</h3>
+      <p class="desc">${(s.description && s.description[lang]) || (s.stub ? t('coming_soon') : '')}</p>
+      <div class="tb-stamp">
+        <div><span class="k">${t('program_hours')}</span>${s.hours}</div>
+        <div><span class="k">Level</span>${difficultyLabel(s.difficulty)}</div>
+      </div>`;
+    sgrid.appendChild(a);
+  });
+
+  const roles = document.getElementById('role-list');
+  prog.roles.forEach(r => {
+    const span = document.createElement('span');
+    span.textContent = r;
+    roles.appendChild(span);
+  });
+
+  const comp = programCompletion(prog);
+  document.getElementById('prog-fill').style.width = comp.percent + '%';
+  const cta = document.getElementById('diploma-cta');
+  if (comp.complete) {
+    cta.innerHTML = `<a class="btn btn-primary" href="certificate.html?program=${prog.id}">${t('get_diploma')}</a>`;
+  } else if (comp.total > 0) {
+    cta.innerHTML = `<span class="pill">${comp.done}/${comp.total} ${t('subjects_done_count')}</span>`;
+  }
+</script>
+</body>
+</html>

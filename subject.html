@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Subject — IndustrCons Learning Hub</title>
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<header id="site-header" class="site-header"></header>
+
+<div class="detail-hero">
+  <div class="wrap">
+    <div class="breadcrumb"><a href="#" id="p-back" data-i18n="back"></a></div>
+    <span class="pill" id="s-code"></span>
+    <h1 id="s-title"></h1>
+    <p class="tagline" id="s-desc"></p>
+    <div class="meta-row" id="s-meta"></div>
+  </div>
+</div>
+<div class="progress-track"><div class="progress-fill" id="progress-fill"></div></div>
+
+<section>
+  <div class="wrap">
+    <div id="full-content" class="stack" style="display:none;">
+
+      <div class="block">
+        <h2 data-i18n="why_title"></h2>
+        <p id="s-why"></p>
+      </div>
+
+      <div class="block">
+        <h2 data-i18n="outcomes_title"></h2>
+        <ul class="outcomes-list" id="s-outcomes"></ul>
+      </div>
+
+      <div class="block">
+        <h2 data-i18n="modules_title"></h2>
+        <ol class="module-list" id="s-modules"></ol>
+      </div>
+
+      <div class="block">
+        <h2 data-i18n="resources_title"></h2>
+        <div id="s-resources"></div>
+      </div>
+
+      <div class="block">
+        <h2 data-i18n="tasks_title"></h2>
+        <div id="s-tasks"></div>
+      </div>
+
+      <div class="block">
+        <h2 data-i18n="assessment_title"></h2>
+        <p id="s-assessment"></p>
+        <p class="muted" id="s-challenge" style="margin-top:10px;font-size:0.9rem;"></p>
+      </div>
+
+    </div>
+
+    <div id="stub-content" style="display:none;">
+      <div class="coming-soon-box" data-i18n="coming_soon"></div>
+    </div>
+  </div>
+</section>
+
+<footer id="site-footer" class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+<script>
+  document.documentElement.lang = getLang();
+  initShell('programs');
+
+  const params = new URLSearchParams(location.search);
+  const sid = params.get('id');
+  const s = DB.subjects[sid];
+  const lang = getLang();
+
+  const parentProgram = DB.programs.find(p => p.subjects.includes(sid));
+  document.getElementById('p-back').href = parentProgram ? `program.html?id=${parentProgram.id}` : 'programs.html';
+
+  document.getElementById('s-code').textContent = s.code;
+  document.getElementById('s-title').textContent = s.title[lang];
+  document.getElementById('s-desc').textContent = (s.description && s.description[lang]) || '';
+  document.getElementById('s-meta').innerHTML = `
+    <span><b>${s.hours}</b>${t('program_hours')}</span>
+    <span><b>${difficultyLabel(s.difficulty)}</b>Level</span>`;
+
+  if (s.stub) {
+    document.getElementById('stub-content').style.display = 'block';
+  } else {
+    document.getElementById('full-content').style.display = 'flex';
+
+    document.getElementById('s-why').textContent = s.why[lang];
+
+    const oc = document.getElementById('s-outcomes');
+    s.outcomes[lang].forEach(o => { const li = document.createElement('li'); li.textContent = o; oc.appendChild(li); });
+
+    const mod = document.getElementById('s-modules');
+    s.modules[lang].forEach(m => { const li = document.createElement('li'); li.textContent = m; mod.appendChild(li); });
+
+    const res = document.getElementById('s-resources');
+    s.resources.forEach(r => {
+      const div = document.createElement('div');
+      div.className = 'resource-card';
+      div.innerHTML = `
+        <div class="r-title">${r.title}</div>
+        <div class="r-org">${r.org} — ${r.type[lang]}</div>
+        <div class="r-why">${r.why[lang]}</div>`;
+      res.appendChild(div);
+    });
+
+    const tasksEl = document.getElementById('s-tasks');
+    s.tasks.forEach(task => {
+      const card = document.createElement('div');
+      card.className = 'task-card';
+      const done = isTaskDone(sid, task.id);
+
+      let checkHtml = '';
+      if (task.check.type === 'mc') {
+        checkHtml = task.check.options[lang].map((opt, i) => `
+          <label style="display:flex;gap:8px;align-items:flex-start;margin-bottom:8px;font-size:0.92rem;cursor:pointer;">
+            <input type="radio" name="check-${task.id}" value="${i}" ${done ? 'disabled' : ''}>
+            <span>${opt}</span>
+          </label>`).join('');
+      } else {
+        checkHtml = `<input type="text" class="check-text-input" placeholder="${t('check_placeholder')}" ${done ? 'disabled' : ''} style="width:100%;padding:10px 12px;border:1px solid var(--line);font-family:var(--sans);font-size:0.92rem;">`;
+      }
+
+      card.innerHTML = `
+        <div class="task-head">
+          <h3>${task.title[lang]}</h3>
+          <span class="task-diff">${difficultyLabel(task.difficulty)}</span>
+        </div>
+        <div class="task-body">
+          <div class="task-field"><span class="lbl">${t('scenario_label')}</span><p>${task.role[lang]} ${task.scenario[lang]}</p></div>
+          <div class="task-field"><span class="lbl">${t('mentor_label')}</span><div class="mentor-box">${task.mentor[lang]}</div></div>
+          <div class="task-field"><span class="lbl">${t('instructions_label')}</span><p>${task.instructions[lang]}</p></div>
+          <div class="task-field"><span class="lbl">${t('criteria_label')}</span><ul class="crit-list">${task.criteria[lang].map(c=>`<li>${c}</li>`).join('')}</ul></div>
+          <div class="task-field" style="border-top:1px dashed var(--line);padding-top:14px;">
+            <span class="lbl">${t('check_label')}</span>
+            <p style="font-weight:600;margin-bottom:10px;">${task.check.question[lang]}</p>
+            <div class="check-widget" data-task="${task.id}">${checkHtml}</div>
+            ${!done ? `<button class="mark-btn check-submit-btn" data-task="${task.id}" style="margin-top:8px;">${t('check_submit')}</button>` : ''}
+            <div class="check-feedback" data-task="${task.id}" style="margin-top:8px;font-size:0.88rem;${done ? 'color:var(--cyan);font-weight:600;' : ''}">${done ? t('check_correct') : ''}</div>
+          </div>
+        </div>
+        <div class="task-foot">
+          <span>${t('format_label')}: ${task.format[lang]} · ${t('time_label')}: ${task.time[lang]}</span>
+          <span class="task-diff" style="color:${done ? 'var(--cyan)' : 'var(--steel)'};">${done ? t('marked_done') : t('task_locked_note')}</span>
+        </div>`;
+      tasksEl.appendChild(card);
+    });
+
+    document.getElementById('s-assessment').textContent = s.assessment[lang];
+    document.getElementById('s-challenge').textContent = s.challengeExam[lang];
+
+    function refreshProgress() {
+      const pct = subjectCompletion(sid, s.tasks.length);
+      document.getElementById('progress-fill').style.width = pct + '%';
+    }
+
+    document.querySelectorAll('.check-submit-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const taskId = btn.dataset.task;
+        const task = s.tasks.find(x => x.id === taskId);
+        const feedback = document.querySelector(`.check-feedback[data-task="${taskId}"]`);
+        let correct = false;
+
+        if (task.check.type === 'mc') {
+          const picked = document.querySelector(`input[name="check-${taskId}"]:checked`);
+          if (!picked) { feedback.style.color = 'var(--amber)'; feedback.textContent = t('check_pick'); return; }
+          correct = parseInt(picked.value, 10) === task.check.correct;
+        } else {
+          const input = document.querySelector(`.check-widget[data-task="${taskId}"] .check-text-input`);
+          const val = (input.value || '').trim().toLowerCase();
+          correct = task.check.answers.some(a => a.toLowerCase() === val);
+        }
+
+        if (correct) {
+          setTaskDone(sid, taskId, true);
+          feedback.style.color = 'var(--cyan)'; feedback.style.fontWeight = '600';
+          feedback.textContent = t('check_correct');
+          document.querySelectorAll(`.check-widget[data-task="${taskId}"] input`).forEach(el => el.disabled = true);
+          btn.remove();
+          const footStatus = btn.closest('.task-card').querySelector('.task-foot span:last-child');
+          footStatus.style.color = 'var(--cyan)';
+          footStatus.textContent = t('marked_done');
+          refreshProgress();
+        } else {
+          feedback.style.color = 'var(--amber)'; feedback.style.fontWeight = '600';
+          feedback.textContent = t('check_wrong');
+        }
+      });
+    });
+
+    refreshProgress();
+  }
+</script>
+</body>
+</html>
