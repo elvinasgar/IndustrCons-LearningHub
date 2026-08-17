@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verify Certificate — IndustrCons Skills Hub</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .verify-card {
+    max-width: 640px; margin: 60px auto; border: 1px solid var(--graphite); padding: 40px 34px; text-align: center;
+  }
+  .status-badge {
+    display: inline-block; font-family: var(--mono); font-size: 0.85rem; font-weight: 600;
+    padding: 8px 18px; border-radius: 999px; margin-bottom: 26px; letter-spacing: 0.05em;
+  }
+  .status-ok { background: #DDEEE2; color: #1F6F43; }
+  .status-revoked { background: #F4DCC9; color: #A34E1D; }
+  .status-notfound { background: var(--paper-2); color: var(--steel); }
+  .v-row { display: flex; justify-content: space-between; padding: 12px 0; border-bottom: 1px solid var(--line); text-align: left; }
+  .v-row .k { font-family: var(--mono); font-size: 0.7rem; text-transform: uppercase; color: var(--steel); letter-spacing: 0.05em; }
+  .v-row .v { font-weight: 600; text-align: right; }
+  .v-disclaimer { font-size: 0.8rem; color: var(--steel); margin-top: 26px; }
+</style>
+</head>
+<body>
+
+<header id="site-header" class="site-header"></header>
+
+<section style="padding-top:20px;">
+  <div class="wrap">
+    <div class="section-head center" style="margin: 0 auto 10px; max-width: 640px;">
+      <h2 data-i18n="verify_title"></h2>
+    </div>
+
+    <div class="verify-card" id="verify-card"></div>
+  </div>
+</section>
+
+<footer id="site-footer" class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+<script>
+  document.documentElement.lang = getLang();
+  initShell('faq');
+
+  const lang = getLang();
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  const card = document.getElementById('verify-card');
+  const cert = id ? getCertById(id) : null;
+
+  if (!cert) {
+    card.innerHTML = `
+      <div class="status-badge status-notfound">${t('verify_status_notfound')}</div>
+      <p class="muted">${t('verify_notfound_body')}</p>`;
+  } else {
+    const program = DB.programs.find(p => p.id === cert.programId);
+    const revoked = cert.status === 'REVOKED';
+    card.innerHTML = `
+      <div class="status-badge ${revoked ? 'status-revoked' : 'status-ok'}">
+        ${revoked ? '⚠ ' + t('verify_status_revoked') : '✓ ' + t('verify_status_ok')}
+      </div>
+      <div class="v-row"><span class="k">${t('dip_cred_label')}</span><span class="v">${cert.certId}</span></div>
+      <div class="v-row"><span class="k">${t('verify_recipient')}</span><span class="v">${cert.name || '—'}</span></div>
+      <div class="v-row"><span class="k">${t('verify_program')}</span><span class="v">${program ? program.title[lang] : cert.programCode}</span></div>
+      <div class="v-row"><span class="k">${t('dip_date_label')}</span><span class="v">${formatFullDate(cert.date, lang)}</span></div>
+      <div class="v-row"><span class="k">${t('dip_level_label')}</span><span class="v">${cert.level}</span></div>
+      <div class="v-row"><span class="k">${t('dip_verify_code_label')}</span><span class="v">${cert.verifyCode}</span></div>
+      <p class="v-disclaimer"><strong>${t('verify_disclaimer_lead')}</strong> ${t('dip_disclaimer')}</p>`;
+  }
+</script>
+</body>
+</html>

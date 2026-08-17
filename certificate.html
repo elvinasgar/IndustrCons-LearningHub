@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="az">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Certificate — IndustrCons Skills Hub</title>
+<link rel="stylesheet" href="css/style.css">
+<style>
+  .cert-page { padding: 48px 0 80px; }
+  .cert-poster {
+    background: var(--paper);
+    border: 3px solid var(--ink);
+    position: relative;
+    padding: 56px 48px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+  .cert-poster::before {
+    content: ""; position: absolute; inset: 12px;
+    border: 1px solid var(--cyan);
+    pointer-events: none;
+  }
+  .cert-inner { position: relative; text-align: center; }
+  .cert-brand { display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 6px; }
+  .cert-brand .mark { width: 26px; height: 26px; border: 2px solid var(--amber); position: relative; }
+  .cert-brand .mark::before, .cert-brand .mark::after { content: ""; position: absolute; background: var(--amber); }
+  .cert-brand .mark::before { top: 50%; left: 3px; right: 3px; height: 2px; transform: translateY(-50%); }
+  .cert-brand .mark::after { left: 50%; top: 3px; bottom: 3px; width: 2px; transform: translateX(-50%); }
+  .cert-brand span { font-family: var(--serif); font-weight: 600; font-size: 1.1rem; letter-spacing: 0.02em; }
+  .cert-tagline { font-family: var(--mono); font-size: 0.68rem; color: var(--steel); letter-spacing: 0.06em; margin-bottom: 24px; }
+  .cert-kicker { font-family: var(--mono); font-size: 0.75rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--cyan); margin-bottom: 10px; }
+  .cert-title { font-family: var(--serif); font-weight: 600; font-size: 2rem; margin: 0 0 30px; }
+  .cert-statement { color: var(--steel); font-size: 0.95rem; margin: 0 0 6px; }
+  .cert-name { font-family: var(--serif); font-size: 1.9rem; font-weight: 600; margin: 8px 0 20px; padding-bottom: 10px; border-bottom: 2px solid var(--ink); display: inline-block; min-width: 60%; }
+  .cert-program { font-family: var(--serif); font-size: 1.4rem; font-weight: 600; margin: 6px 0 30px; color: var(--steel); }
+  .cert-meta {
+    display: flex; justify-content: center; gap: 34px; flex-wrap: wrap;
+    border-top: 1px solid var(--line); border-bottom: 1px solid var(--line);
+    padding: 20px 0; margin-bottom: 26px;
+  }
+  .cert-meta div { text-align: center; }
+  .cert-meta .k { font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.07em; color: var(--steel); display: block; margin-bottom: 4px; }
+  .cert-meta .v { font-family: var(--mono); font-size: 0.88rem; color: var(--ink); }
+  .cert-sign-row { display: flex; justify-content: space-between; align-items: flex-end; margin: 30px 0 10px; text-align: left; flex-wrap: wrap; gap: 20px; }
+  .cert-sign-name { font-family: 'Fraunces', serif; font-style: italic; font-size: 1.3rem; border-bottom: 1px solid var(--graphite); padding-bottom: 4px; margin-bottom: 4px; display: inline-block; }
+  .cert-sign-role { font-size: 0.78rem; color: var(--steel); }
+  .cert-qr img { width: 96px; height: 96px; border: 1px solid var(--line); }
+  .cert-linkedin { font-family: var(--mono); font-size: 0.78rem; color: var(--cyan); margin-bottom: 8px; }
+  .cert-verify-note { font-size: 0.76rem; color: var(--steel); max-width: 50ch; margin: 0 auto 4px; }
+  .cert-disclaimer { font-size: 0.7rem; color: var(--steel); max-width: 56ch; margin: 16px auto 0; opacity: 0.8; }
+  .cert-actions { text-align: center; margin-top: 28px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .name-gate { max-width: 480px; margin: 60px auto; text-align: center; }
+  .name-gate input {
+    width: 100%; padding: 14px 16px; font-family: var(--serif); font-size: 1.2rem; text-align: center;
+    border: 1px solid var(--graphite); margin: 18px 0; background: var(--paper);
+  }
+  .share-box { max-width: 640px; margin: 40px auto 0; border: 1px solid var(--line); padding: 24px; }
+  .share-box h3 { font-family: var(--serif); margin: 0 0 8px; }
+  .share-box textarea {
+    width: 100%; min-height: 160px; font-family: var(--sans); font-size: 0.86rem; padding: 12px;
+    border: 1px solid var(--line); margin: 14px 0; resize: vertical;
+  }
+
+  @media print {
+    .site-header, .site-footer, .cert-actions, .breadcrumb-row, .share-box, .name-gate { display: none !important; }
+    body { background: white; }
+    section.cert-page { padding: 0; }
+    .cert-poster { border-width: 2px; box-shadow: none; }
+  }
+</style>
+</head>
+<body>
+
+<header id="site-header" class="site-header"></header>
+
+<section class="cert-page">
+  <div class="wrap">
+    <div class="breadcrumb breadcrumb-row"><a href="#" id="back-link" data-i18n="dip_back_to_program"></a></div>
+
+    <div id="locked-view" style="display:none;text-align:center;padding:60px 20px;">
+      <h1 style="font-family:var(--serif);font-size:1.6rem;margin-bottom:12px;" data-i18n="dip_locked_title"></h1>
+      <p class="muted" data-i18n="dip_locked_body"></p>
+    </div>
+
+    <div id="name-gate" class="name-gate" style="display:none;">
+      <div class="cert-kicker" data-i18n="dip_kicker" style="text-align:center;"></div>
+      <h1 style="font-family:var(--serif);font-size:1.5rem;" id="name-gate-title"></h1>
+      <p class="muted" data-i18n="dip_name_prompt"></p>
+      <input type="text" id="name-gate-input" data-i18n-placeholder="dip_name_placeholder">
+      <p style="font-size:0.8rem;color:var(--steel);" data-i18n="dip_name_note"></p>
+      <button class="btn btn-primary" id="name-gate-confirm" data-i18n="dip_confirm_name"></button>
+    </div>
+
+    <div id="cert-view" style="display:none;">
+      <div class="cert-poster">
+        <div class="cert-inner">
+          <div class="cert-brand"><span class="mark"></span><span id="cert-brand-text"></span></div>
+          <div class="cert-tagline" id="cert-tagline"></div>
+          <div class="cert-kicker" data-i18n="dip_kicker"></div>
+          <h1 class="cert-title" id="cert-title"></h1>
+
+          <p class="cert-statement" id="cert-awarded-to"></p>
+          <div class="cert-name" id="cert-name"></div>
+          <p class="cert-statement" id="cert-awarded-for"></p>
+          <p class="cert-program" id="cert-program"></p>
+
+          <div class="cert-meta">
+            <div><span class="k" data-i18n="dip_cred_label"></span><span class="v" id="cert-id"></span></div>
+            <div><span class="k" data-i18n="dip_verify_code_label"></span><span class="v" id="cert-vcode"></span></div>
+            <div><span class="k" data-i18n="dip_date_label"></span><span class="v" id="cert-date"></span></div>
+            <div><span class="k" data-i18n="dip_level_label"></span><span class="v" id="cert-level"></span></div>
+          </div>
+
+          <div class="cert-sign-row">
+            <div>
+              <div class="cert-sign-name" id="cert-founder-name"></div>
+              <div class="cert-sign-role" id="cert-founder-role"></div>
+            </div>
+            <div class="cert-qr"><img id="cert-qr-img" alt="QR"></div>
+          </div>
+
+          <div class="cert-linkedin" id="cert-linkedin"></div>
+          <p class="cert-verify-note" data-i18n="dip_verify_note"></p>
+          <p class="cert-disclaimer" data-i18n="dip_disclaimer"></p>
+        </div>
+      </div>
+
+      <div class="cert-actions">
+        <button class="btn btn-primary" id="print-btn" data-i18n="dip_print"></button>
+        <a class="btn btn-ghost" id="verify-btn" href="#" target="_blank" data-i18n="dip_verify_btn"></a>
+      </div>
+
+      <div class="share-box">
+        <h3 data-i18n="share_title"></h3>
+        <p class="muted" data-i18n="share_lead"></p>
+        <textarea id="share-text" readonly></textarea>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
+          <button class="btn btn-primary" id="copy-post-btn" data-i18n="share_copy_btn"></button>
+          <a class="btn btn-ghost" id="linkedin-open-btn" href="#" target="_blank" data-i18n="share_open_btn"></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer id="site-footer" class="site-footer"></footer>
+
+<script src="js/data.js"></script>
+<script src="js/i18n.js"></script>
+<script src="js/app.js"></script>
+<script>
+  document.documentElement.lang = getLang();
+  initShell('programs');
+
+  const params = new URLSearchParams(location.search);
+  const prog = DB.programs.find(p => p.id === params.get('program'));
+  const lang = getLang();
+  document.getElementById('back-link').href = prog ? `program.html?id=${prog.id}` : 'programs.html';
+
+  if (!prog) {
+    document.getElementById('locked-view').style.display = 'block';
+  } else {
+    const comp = programCompletion(prog);
+    if (!comp.complete) {
+      document.getElementById('locked-view').style.display = 'block';
+    } else {
+      const rec = getDiplomaRecord(prog);
+
+      if (!rec.name) {
+        document.getElementById('name-gate').style.display = 'block';
+        document.getElementById('name-gate-title').textContent = t('dip_title_prefix');
+        const input = document.getElementById('name-gate-input');
+        input.placeholder = t('dip_name_placeholder');
+        document.getElementById('name-gate-confirm').addEventListener('click', () => {
+          const val = input.value.trim();
+          if (!val) { input.focus(); return; }
+          saveDiplomaName(rec.certId, val);
+          location.reload();
+        });
+      } else {
+        renderCert(rec);
+      }
+    }
+  }
+
+  function renderCert(rec) {
+    document.getElementById('cert-view').style.display = 'block';
+
+    document.getElementById('cert-brand-text').textContent = t('brand');
+    document.getElementById('cert-tagline').textContent = t('brand_tagline');
+    document.getElementById('cert-title').textContent = t('dip_title_prefix');
+    document.getElementById('cert-awarded-to').textContent = t('dip_awarded_to');
+    document.getElementById('cert-name').textContent = rec.name;
+    document.getElementById('cert-awarded-for').textContent = t('dip_awarded_for');
+    document.getElementById('cert-program').textContent = prog.title[lang];
+    document.getElementById('cert-id').textContent = rec.certId;
+    document.getElementById('cert-vcode').textContent = rec.verifyCode;
+    document.getElementById('cert-date').textContent = formatFullDate(rec.date, lang);
+    document.getElementById('cert-level').textContent = rec.level;
+    document.getElementById('cert-founder-name').textContent = t('dip_founder');
+    document.getElementById('cert-founder-role').textContent = `${t('dip_founder_title')} — ${t('dip_founder_org')}`;
+    document.getElementById('cert-linkedin').textContent = 'IndustrCons — linkedin.com/company/industrcons';
+
+    const verifyUrl = `${location.origin}${location.pathname.replace(/certificate\.html.*$/, '')}verify.html?id=${rec.certId}`;
+    document.getElementById('cert-qr-img').src = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(verifyUrl)}`;
+    document.getElementById('verify-btn').href = verifyUrl;
+
+    document.getElementById('print-btn').addEventListener('click', () => window.print());
+
+    const postText = buildLinkedInPost(prog, rec, lang);
+    document.getElementById('share-text').value = postText;
+    document.getElementById('copy-post-btn').addEventListener('click', () => {
+      navigator.clipboard.writeText(postText).then(() => {
+        const btn = document.getElementById('copy-post-btn');
+        const old = btn.textContent;
+        btn.textContent = t('share_copied');
+        setTimeout(() => btn.textContent = old, 1600);
+      });
+    });
+    document.getElementById('linkedin-open-btn').href = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(verifyUrl)}`;
+  }
+</script>
+</body>
+</html>
